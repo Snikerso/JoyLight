@@ -2,16 +2,23 @@
 #define JOYSTICK_H
 
 // Joystick pin configuration
-#define PIN_VRX A3
+#define PIN_VRX A0
+#define PIN_VRY A1
+#define PIN_SW  2
 
+struct JoystickValues {
+    int valueX;
+    int valueY;
+    int valueButton;
+  };
+  
 // Joystick variables
 extern int cx; // kalibracja środka
-extern int odczyt;
+extern JoystickValues values;
 
 // Function declarations
 void initJoystick();
-int readAxis();
+JoystickValues readJoystickValues();
 void calibrateCenter();
-int getJoystickValue();
 
 #endif

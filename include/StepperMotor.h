@@ -14,7 +14,7 @@
 
 // Stepper motor configuration
 #define STEPS_PER_REV 200  // Steps per revolution (1.8° stepper)
-#define MAX_SPEED 1000     // Maximum speed in steps per second
+#define MAX_SPEED 500     // Maximum speed in steps per second
 #define ACCELERATION 500   // Acceleration in steps per second squared
 
 // Global AccelStepper object
@@ -35,16 +35,10 @@ void stopMotor();
 void moveToPosition(long position);
 void moveRelative(long steps);
 
-// Potentiometer control functions
-int readPotentiometerDirection();
-void continuousMotorControlWithPotentiometer(int potDirection);
-float readPotentiometerSpeed();
+// Joystick control functions
+void continuousMotorControlWithJoystick(int joystickX, int joystickY);
+int getJoystickDirection(int joystickX);
+float getJoystickSpeed(int joystickX);
 
-// Motor diagnostic functions
-bool checkMotorResponse();
-void testMotorPhases();
-void testMotorCurrent();
-void displayMotorStatus();
-void simpleMotorTest();
 
 #endif // STEPPER_MOTOR_H

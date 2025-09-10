@@ -6,7 +6,9 @@ AccelStepper stepper(AccelStepper::DRIVER, PIN_STEP, PIN_DIR);
 void initStepperMotor() {
   // Configure enable pin as output
   pinMode(PIN_ENA, OUTPUT);
-  
+  pinMode(PIN_DIR, OUTPUT);
+  pinMode(PIN_STEP, OUTPUT);
+
   // Configure potentiometer pin as input
   pinMode(PIN_POT, INPUT);
   
@@ -16,7 +18,7 @@ void initStepperMotor() {
   stepper.setCurrentPosition(0);
   
   // Disable motor initially
-  disableStepperMotor();
+  enableStepperMotor();
   
   Serial.println(F("AccelStepper motor initialized"));
   Serial.print(F("Max speed: "));
@@ -108,56 +110,68 @@ void stopMotor() {
   disableStepperMotor();
 }
 
-// Potentiometer direction control functions implementation
-int readPotentiometerDirection() {
-  int potValue = analogRead(PIN_POT);
-  
+// Joystick control functions implementation
+int getJoystickDirection(int value) {
   // Create dead zone in the middle (around 512)
-  if (potValue > 450 && potValue < 574) {
-    return 0; // Stop - middle position
-  } else if (potValue <= 450) {
+  // Using a wider dead zone for better control
+
+  int leftMax = 300;  
+  int rightMax = 400;
+
+  if (value > leftMax && value < rightMax) {
+    return 0; // Stop - middle position - stop
+  } else if (value <= leftMax) {
     return -1; // Counter-clockwise - left side
   } else {
     return 1; // Clockwise - right side
   }
 }
 
-float readPotentiometerSpeed() {
-  int potValue = analogRead(PIN_POT);
+float getJoystickSpeed(int value) {
+  // TODO ZROBIC ZEBY wartość od zera do srodka była 0-10, a od srodka do max była 10-0
   
-  // Map potentiometer value to speed (0 to MAX_SPEED)
-  float speed = map(potValue, 0, 1023, 0, MAX_SPEED);
+
+  // int center = 412;
+  // int distance = abs(value - center);
+  // Map distance to speed (0 to MAX_SPEED)
+  // Start from dead zone edge (112 from center) to max distance (512 from center)
+  // Serial.print(F("Joystick value: "));
+  // Serial.println(distance);
+
+  // Mapuj odległość: 10-1023 → 0-10
+  float speed = map(value, 10, 1023, 1, 10);
+
+  Serial.print(F("Joystick speed: "));
+  Serial.println(speed);
+  
+  // Ograniczenia prędkości
+  // if (speed < 100) speed = 100;  // Minimum dla płynnego ruchu
+  // if (speed > MAX_SPEED) speed = MAX_SPEED;
+  
   return speed;
 }
 
-void continuousMotorControlWithPotentiometer(int potDirection) {
-  if (potDirection == 0) {
-    // Stop motor
+void continuousMotorControlWithJoystick(int joystickX, int joystickY) {
+  int direction = getJoystickDirection(joystickX);
+  float speed = getJoystickSpeed(joystickY);
+  Serial.print(F("Joystick speed: "));
+  Serial.println(speed);
+  
+  // set speed 
+  if (direction == -1) {
+    stepper.setSpeed(speed);
+  } else if (direction == 1) {
+    stepper.setSpeed(-speed);
+  } else {
     stepper.stop();
     disableStepperMotor();
     return;
   }
-  
-  // Enable motor
-  enableStepperMotor();
-  
-  // Set speed based on potentiometer
-  float speed = readPotentiometerSpeed();
-  stepper.setMaxSpeed(speed);
-  
-  // Set direction and move
-  if (potDirection > 0) {
-    stepper.move(1000); // Move forward
-  } else {
-    stepper.move(-1000); // Move backward
-  }
-  
-  // Run one step
-  stepper.run();
+
+  // run motor
+  stepper.runSpeed();
 }
 
-
-// Simple test function using AccelStepper
 void simpleMotorTest() {
   Serial.println(F("=== ACCELSTEPPER MOTOR TEST ==="));
   
@@ -165,28 +179,7 @@ void simpleMotorTest() {
   enableStepperMotor();
   
   // Set conservative speed and acceleration for 6V motor
-  stepper.setMaxSpeed(200);
-  stepper.setAcceleration(100);
-  
-  // Move 20 steps forward
-  Serial.println(F("Moving 20 steps forward..."));
-  stepper.moveTo(20);
-  while (stepper.distanceToGo() != 0) {
-    stepper.run();
-  }
-  
-  delay(2000);
-  
-  // Move back to position 0
-  Serial.println(F("Moving back to position 0..."));
-  stepper.moveTo(0);
-  while (stepper.distanceToGo() != 0) {
-    stepper.run();
-  }
-  
-  disableStepperMotor();
-  Serial.println(F("Test complete"));
-  
-  // Wait 5 seconds before next test
-  delay(5000);
+  stepper.setMaxSpeed(1000);
+  stepper.setSpeed(500);
+  stepper.runSpeed();
 }

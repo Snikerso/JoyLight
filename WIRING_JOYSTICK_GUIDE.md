@@ -1,16 +1,17 @@
-# Okablowanie Joysticka Analogowego
+# Okablowanie Joysticka Analogowego - Adafruit 5628
 
 ## Konfiguracja Podstawowa
 
 Połącz joystick analogowy z Arduino Uno:
 
-| Joystick | Arduino Uno | Opis                        |
-| -------- | ----------- | --------------------------- |
-| VCC      | 5V          | Zasilanie                   |
-| GND      | GND         | Masa                        |
-| VRX      | Pin A3      | Oś X (pozioma)              |
-| VRY      | Nie używany | Oś Y (pionowa) - opcjonalna |
-| SW       | Nie używany | Przycisk - opcjonalny       |
+| Joystick  | Arduino Uno | Opis                        |
+| --------- | ----------- | --------------------------- |
+| VCC       | 5V          | Zasilanie                   |
+| GND       | GND         | Masa                        |
+| VRX (AD2) | Pin A3      | Oś X (pozioma)              |
+| GND       | GND         | Masa                        |
+| SWITCH    | Pin A3      | Przycisk - opcjonalny       |
+| VRY (AD1) | Nie używany | Oś Y (pionowa) - opcjonalna |
 
 ## Szczegóły Połączeń
 

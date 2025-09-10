@@ -3,7 +3,9 @@
 
 // Joystick variables definition
 int cx = 0; // kalibracja środka
-int odczyt = 0;
+int valueX = 0;
+int valueY = 0;
+int valueButton = 0;
 
 void initJoystick() {
   pinMode(PIN_VRX, INPUT);
@@ -13,9 +15,14 @@ void initJoystick() {
   calibrateCenter();
 }
 
-int readAxis() {
-  odczyt = analogRead(PIN_VRX);
-  return odczyt;
+
+JoystickValues readJoystickValues() {
+  valueX = analogRead(PIN_VRX);
+  valueY = analogRead(PIN_VRY);
+  valueButton = digitalRead(PIN_SW);
+
+
+  return { valueX, valueY, valueButton };
 }
 
 void calibrateCenter() {
@@ -31,8 +38,3 @@ void calibrateCenter() {
   Serial.println(cx);
 }
 
-int getJoystickValue() {
-  int value = readAxis();
-  // Można dodać dodatkowe przetwarzanie tutaj
-  return value;
-}
